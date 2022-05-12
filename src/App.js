@@ -11,45 +11,69 @@ import ForwardDirectoryTree from 'antd/lib/tree/DirectoryTree';
 function App() {
 
   const [foodList, setFoodList] = useState(foods)
+  const [foodListEmpty, setFoodListEmpty] = useState(false)
+  const [showButton, setShowButton] = useState(false);
 
   const addNewFood = (newFood) => {
     const updatedFood = [...foodList, newFood]
 
     setFoodList(updatedFood)
+
+    if (updatedFood.length === 0) {
+      setFoodListEmpty(true)
+    } else {
+      setFoodListEmpty(false)
+    }
   }
-  
 
-  const searchForFood = (string) =>{
-    
-    if (string === ""){
+
+  const searchForFood = (string) => {
+    let searchList
+
+    if (string === "") {
       setFoodList(foods)
-
-    } else{
-      const searchList = foodList.filter(food=>food.name.toLowerCase().includes(string.toLowerCase()))
+      //searchList = foodList
+    } else {
+      searchList = foodList.filter(food => food.name.toLowerCase().includes(string.toLowerCase()))
       setFoodList(searchList)
+    }
+    //setFoodList(searchList)
+  }
+
+  const deleteFood = (food) => {
+    const newArr = foodList.filter(e => e.name != food)
+    setFoodList(newArr)
+
+    if (newArr.length === 0) {
+      setFoodListEmpty(true)
+    } else {
+      setFoodListEmpty(false)
     }
 
   }
 
-  const deleteFood = (food)=>{
-    const newArr = foodList.filter(e=>e.name!=food)
-    setFoodList(newArr)
+  const toggleShowButton = () => {
+    setShowButton(!showButton);
   }
+
+  //console.log(foodList.length, foodListEmpty)
 
   return (
     <div className="App">
-      <h1>Food List</h1>
 
-      <Search  searchBar={searchForFood} />
-      <AddFoodForm  addFood={addNewFood} />
+      {showButton && <AddFoodForm addFood={addNewFood} />}
+      <button onClick={toggleShowButton}>{showButton ? 'Hide' : 'Add food'}</button>
+
+      <Search searchBar={searchForFood} />
+
+      <Divider>Food List</Divider>
+      {foodListEmpty && <div><strong>Oops! There is no more content to show.</strong></div>}
 
       <Row>
-      {foodList.map((food, i) => {
-        return <FoodBox key={i} food={ food } delete={deleteFood} />
-      })}
+        {foodList.map((food, i) => {
+          return <FoodBox key={i} food={food} delete={deleteFood} />
+        })}
       </Row>
-
-
 
     </div>
   );
